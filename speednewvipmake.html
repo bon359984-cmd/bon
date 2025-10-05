@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Menu FF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.7/lib/theme-chalk/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/element-ui@2.15.7/lib/index.js"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            color: #fff; 
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            
+        }
+
+        .ayimgui {
+            position: fixed;
+            width: 360px;
+            max-height: 500px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            border-radius: 16px;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .aytitle {
+            padding: 15px 20px;
+            font-size: 20px;
+            z-index: 0;
+            cursor: pointer;
+            border-radius: 16px 16px 0 0;
+            position: relative;
+            font-weight: 600;
+            line-height: normal;
+            min-height: 50px;
+            min-width: 0;
+            padding: 8px 16px;
+            border: none;
+            outline: none;
+            color: #fff;
+            background: #111;
+            overflow: hidden;
+            transition: transform 0.2s ease, background-color 0.2s ease; 
+        }
+        
+        .aytitle:after {
+            content: "";
+            background: linear-gradient(to right, rgb(0, 0, 0), #000000, #000000, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8,); /* Sá»­ dá»¥ng linear-gradient vá»i hÆ°á»ng tá»« trÃ¡i sang pháº£i */
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            background-size: 200% auto; 
+            z-index: -1;
+            filter: blur(5px);
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            animation: glowing 25s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            border-radius: 10px;
+        }
+        
+        .aytitle:after {
+            opacity: 1;
+        }
+        
+        @keyframes glowing {
+            0% {
+                background-position: 200% center; 
+            }
+            100% {
+                background-position: -200% center;
+            }
+        }
+        
+        
+
+        .aytitle .titleClose {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        .aybody {
+            height: 320px;
+            padding: 20px;
+            font-size: 14px;
+            background-color: #444; 
+        }
+
+        .aytab {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #387CCC;
+            padding-bottom: 10px;
+        }
+
+        .aytab span {
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            
+            color: #fff;
+        }
+
+        .activeTab {
+            background-color: #387CCC;
+            color: #fff;
+        }
+
+
+        
+        .custom-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .custom-switch .switch-label {
+            flex-grow: 1;
+            margin-left: 15px;
+        }
+
+        .custom-switch input[type="checkbox"] {
+            display: none;
+        }
+
+        .custom-switch input[type="checkbox"]+label {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+            border-radius: 12px;
+            background-color: #666; 
+            cursor: pointer;
+        }
+
+        .custom-switch input[type="checkbox"]+label::before,
+        .custom-switch input[type="checkbox"]+label::after {
+            content: "";
+            display: block;
+            position: absolute;
+            transition: all 0.3s;
+        }
+
+        .custom-switch input[type="checkbox"]+label::before {
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #fff; 
+        }
+
+        .custom-switch input[type="checkbox"]:checked+label {
+            background-color: #4CAF50;
+        }
+
+        .custom-switch input[type="checkbox"]:checked+label::before {
+            left: calc(100% - 3px);
+            transform: translateX(-100%);
+        }
+
+        .custom-switch input[type="checkbox"]+label::before,
+        .custom-switch input[type="checkbox"]:checked+label::before {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<script>
+    h5gg.require(7.9); 
+    var h5frida=h5gg.loadPlugin("h5frida", "Frameworks/h5frida-16.0.10.dylib");
+    if(!h5frida) throw "Failed to load h5frida plugin";
+    
+    function ActiveCodePatch(fpath, vaddr, bytes) {
+        if(!h5frida.ActiveCodePatch(fpath, vaddr, bytes)) {
+            var result = h5frida.ApplyCodePatch(fpath, vaddr, bytes);
+            alert(fpath+":0x"+vaddr.toString(16)+"-ä¿®æ¹å¤±è´¥!\n" + fpath+":0x"+vaddr.toString(16)+"-PatchFailed!\n" + result);return false;
+        } return true;
+    }
+    function DeactiveCodePatch(fpath, vaddr, bytes) {
+        return h5frida.DeactiveCodePatch(fpath, vaddr, bytes);
+    }
+
+    if(typeof h5gg!='undefined') {
+       
+        setWindowDrag(0, 0, 400, 80);
+     
+    };
+	
+	</script>
+<body>
+    <div id="app">
+        <div class="ayimgui">
+            <div class="aytitle">BONVIPPROMAX
+                <span class="titleClose" @click="closeimgui">&times;</span>
+            </div>
+            <div class="aybody">
+                <div class="aytab">
+                    <span @click="changeTab('hzgn')" :class="{ activeTab: tabValue === 'hzgn' }">Chức năng</span>
+                    <span @click="changeTab('bhgn')" :class="{ activeTab: tabValue === 'bhgn' }">Mods</span>
+                    <span @click="changeTab('qtgn')" :class="{ activeTab: tabValue === 'qtgn' }">Thông Tin</span>
+                </div>
+								
+                <transition name="fade">
+                    <div v-show="tabValue==='hzgn'">
+                        <div class="custom-switch">
+                            <input type="checkbox" id="fs1" name="fs1" onclick="fs1(this)">
+                            <label for="fs1"></label>
+                            <span class="switch-label">Tìm Speed</span>
+                        </div>
+                        <div class="custom-switch">
+                            <input type="checkbox" id="fs2" name="fs2" onclick="fs2(this)">
+                            <label for="fs2"></label>
+                            <span class="switch-label">Bật Speed</span>
+                        </div>
+                        <div class="custom-switch">
+                            <input type="checkbox" id="fs3" name="fs3" onclick="fs3(this)">
+                            <label for="fs3"></label>
+                            <span class="switch-label">tắt Speed
+                        </div>
+                            <div class="custom-switch">
+                            <input type="checkbox" id="doisungnhanh" name="doisungnhanh" onclick="doisungnhanh(this)">
+                            <label for="doisungnhanh"></label>
+                            <span class="switch-label">đổi súng nhanh</span>
+                        </div>
+                    </div>
+                </transition>
+                <transition name="fade">
+                    <div v-show="tabValue === 'bhgn'">
+                            <div class="custom-switch">
+                            <input type="checkbox" id="magic" name="magic" onclick="magic(this)">
+                            <label for="magic"></label>
+                            <span class="switch-label">Magic</span>
+                        </div>
+                            <div class="custom-switch">
+                            <input type="checkbox" id="antenvai" name="antenvai" onclick="antenvai(this)">
+                            <label for="antenvai"></label>
+                            <span class="switch-label">Än Ten Vai</span>
+                        </div>
+                            <div class="custom-switch">
+                            <input type="checkbox" id="fs4" name="fs4" onclick="fs4(this)">
+                            <label for="fs4"></label>
+                            <span class="switch-label">Mod SÃ³i</span>
+                        </div>
+                            <div class="custom-switch">
+                            <input type="checkbox" id="fs5" name="fs5" onclick="fs5(this)">
+                            <label for="fs5"></label>
+                            <span class="switch-label">Mod Naruto</span>
+                        </div>
+                            <div class="custom-switch">
+                            <input type="checkbox" id="fs6" name="fs6" onclick="fs6(this)">
+                            <label for="fs6"></label>
+                            <span class="switch-label">Táº¯t Táº¥t Cáº£ Chá»©c NÄng
+                        </div>
+                       </div>
+                </transition>
+                <transition name="fade">
+                    <div v-show="tabValue === 'qtgn'">
+                        
+                        <center><em><script type="text/javascript">
+                            farbbibliothek = new Array();
+                            farbbibliothek[0] = new Array("#FF0000","#FF4000","#FF8000","#FFC000","#FFFF00","#C0FF00","#80FF00","#40FF00","#00FF00","#00FF40","#00FF80","#00FFC0","#00FFFF","#00C0FF","#0080FF","#0040FF","#0000FF","#4000FF","#8000FF","#C000FF","#FF00FF","#FF00C0","#FF0080","#FF0040");
+                            farben = farbbibliothek[0];
+                            
+                            function farbschrift() {
+                              for(var i=0 ; i<Buchstabe.length; i++) {
+                                document.all["a"+i].style.color=farben[i];
+                              }
+                              farbverlauf();
+                            }
+                            
+                            function string2array(text) {
+                              Buchstabe = new Array();
+                              while(farben.length<text.length) {
+                                farben = farben.concat(farben);
+                              }
+                              k=0;
+                              while(k<=text.length) {
+                                Buchstabe[k] = text.charAt(k);
+                                k++;
+                              }
+                            }
+                            
+                            function divserzeugen() {
+                              for(var i=0 ; i<Buchstabe.length; i++) {
+                                document.write("<span id='a"+i+"' class='a"+i+"'>"+Buchstabe[i] + "<\/span>");
+                              }
+                              farbschrift();
+                            }
+                            
+                            function farbverlauf() {
+                              for(var i=0 ; i<farben.length; i++) {
+                                farben[i-1]=farben[i];
+                              }
+                              farben[farben.length-1]=farben[-1];
+                              setTimeout("farbschrift()",30);
+                            }
+                            
+                            text= "IOSGODS.XYZ";
+                            string2array(text);
+                            divserzeugen();
+                            </script>
+                            </em></center>
+                        
+
+                        <a class="aytext">___________________________________________________</a>
+
+                    <center><p class="aytext">CONTACT ME ON:</p></center>
+                        
+                <center><p class="aytext">Telegram: @Boniosvippromax</p></center>
+            
+        <center><p class="aytext">Menu Make Buy  Bon
+                    </div>
+                </transition>
+            </div>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    tabValue: "hzgn",
+                }
+            },
+            methods: {
+                changeTab(v) {
+                    this.tabValue = v;
+                },
+                closeimgui() {
+                    setWindowVisible(false);
+                }
+            }
+        });
+    </script>
+    <script>
+ function antenvai() {
+    h5gg.clearResults();
+    h5gg.searchNumber('4575657222469899220', 'I64', '0x100000000', '0x160000000');
+    h5gg.editAll('4848124999925814228', 'I64');
+    h5gg.clearResults();
+    h5gg.searchNumber('4575657222469336965', 'I64', '0x100000000', '0x160000000');
+    h5gg.editAll('4848124999925251973', 'I64');
+    
+
+
+}
+  function magic() {
+    h5gg.clearResults();
+    h5gg.searchNumber('4333543704410193920', 'I64', '0x100000000', '0x160000000');
+    h5gg.searchNearby('0.01', 'F32', '0x8');
+    h5gg.searchNearby('0.0219~0.02975', 'F32', '0x32')
+    h5gg.searchNearby('0.1035~0.1070', 'F32', '0x4');
+    h5gg.searchNearby('2.802597e-45', 'F32', '0x4');
+    h5gg.searchNumber('0.1035~0.1070', 'F32', '0x100000000', '0x160000000');
+    h5gg.editAll('1.875', "F32");
+    
+}
+ function doisungnhanh() {
+    h5gg.clearResults();
+    h5gg.searchNumber('72340173878198272', 'I64', '0x100000000', '0x130000000');
+    h5gg.editAll('72340172821233664', 'I64');
+    
+
+
+}
+ function fs1() {
+            h5gg.clearResults();
+            h5gg.searchNumber('4397530849764387586', 'I64', '0x100000000', '0x200000000');
+        }
+ function fs2() {
+            h5gg.editAll('4366458311853685297', 'I64');
+        }
+
+ function fs3() {
+            h5gg.editAll('4397530849764387586', 'I64');
+        }
+ function fs4() {
+        h5gg.clearResults();
+        h5gg.searchNumber('914000001', 'I32', '0x100000000', '0x200000000');
+        h5gg.editAll('914000003', 'I32');
+        } 
+        function fs5() {
+        h5gg.clearResults();
+        h5gg.searchNumber('914000003', 'I32', '0x100000000', '0x200000000');
+        h5gg.editAll('914047001', 'I32');
+        } 
+        function fs6() {
+        h5gg.clearResults();
+        h5gg.searchNumber('914047001', 'I32', '0x100000000', '0x200000000');
+        h5gg.editAll('914000001', 'I32');
+        } 
+     
+
+
+</script>
+
+</body>
+
+</html>
